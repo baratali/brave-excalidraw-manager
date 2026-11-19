@@ -1,0 +1,6 @@
+export interface Scene {type:'excalidraw';version:number;source?:string;elements:any[];appState:Record<string,any>;files:Record<string,any>}
+export function parseScene(text:string):Scene {const s=JSON.parse(text);if(s.type!=='excalidraw'||!Array.isArray(s.elements)||!s.elements.every((e:any)=>e&&typeof e.id==='string'&&typeof e.type==='string'))throw Error('Invalid Excalidraw drawing');return {...s,appState:s.appState||{},files:s.files||{}};}
+export function scene(elements:any[],state:any,files:any):Scene {const live=elements.filter(e=>!e.isDeleted);return {type:'excalidraw',version:2,source:'https://excalidraw.com',elements:live,appState:Object.fromEntries(['viewBackgroundColor','gridSize','gridStep','gridModeEnabled'].filter(k=>state[k]!==undefined).map(k=>[k,state[k]])),files:Object.fromEntries(Object.entries(files).filter(([id])=>live.some(e=>e.fileId===id)))};}
+export function safePath(path:string){const parts=path.split('/');if(!path||parts.some(p=>!p||p==='.'||p==='..'||/[\\\x00-\x1f]/.test(p)))throw Error('Invalid relative path');return parts;}
+export async function revision(text:string){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text))),b=>b.toString(16).padStart(2,'0')).join('');}
+export const emptyScene=()=>scene([],{},{});

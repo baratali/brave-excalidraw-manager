@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Excalidraw Folder Manager",
+  "version": "1.0.1",
+  "description": "Browse and sync local Excalidraw drawings.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://excalidraw.com/*"
+  ],
+  "background": {
+    "service_worker": "worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Excalidraw Folder Manager"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://excalidraw.com/*"
+      ],
+      "js": [
+        "bridge.js"
+      ],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://excalidraw.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

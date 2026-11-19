@@ -1,0 +1,3 @@
+export async function db(){return new Promise<IDBDatabase>((resolve,reject)=>{const r=indexedDB.open('excalidraw-manager',1);r.onupgradeneeded=()=>r.result.createObjectStore('data');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
+export async function get(key:string){const d=await db();return new Promise<any>((resolve,reject)=>{const t=d.transaction('data');const r=t.objectStore('data').get(key);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);t.oncomplete=()=>d.close();});}
+export async function put(key:string,value:any){const d=await db();return new Promise<void>((resolve,reject)=>{const t=d.transaction('data','readwrite');t.objectStore('data').put(value,key);t.oncomplete=()=>{d.close();resolve();};t.onerror=()=>reject(t.error);});}
