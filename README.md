@@ -6,6 +6,8 @@ A Manifest V3 Brave extension adding a local file sidebar to https://excalidraw.
 
 Run `npm install`, `npm run typecheck`, `npm test`, and `npm run build`. In `brave://extensions`, enable Developer mode, click **Load unpacked**, and select `dist/`. Open or reload Excalidraw, click **Connect folder**, then choose the folder in the extension setup tab. If the picker is unavailable, enable `brave://flags/#file-system-access-api` and relaunch Brave. Folder permissions may need reconnecting after restart.
 
+The active drawing is remembered per tab across page refreshes. The manager verifies the restored canvas and folder before reconnecting; pending edits remain unsaved and external edits use the conflict flow.
+
 Drawings are saved after 750 ms of inactivity. Ctrl/Cmd+S saves immediately; Ctrl/Cmd+Shift+P opens recent/search mode. Paths in creation dialogs are relative to the selected folder. Rename / Move accepts a new relative path; create destination folders first. Trash stores copies inside `.excalidraw-manager-trash` and supports restoring to a chosen path.
 
 Keep only one Excalidraw tab open. If sync pauses, close other tabs and click Reconcile. External disk edits are checked every two seconds while visible; conflicts require choosing a version. Browser recovery drafts are retained in extension IndexedDB. Do not uninstall the extension if you need unsaved drafts. Browser APIs cannot provide atomic locking against another application editing the same file.
