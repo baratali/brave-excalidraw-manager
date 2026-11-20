@@ -1,6 +1,6 @@
 {
   "name": "brave-excalidraw-manager",
-  "version": "1.0.4",
+  "version": "1.0.8",
   "private": true,
   "type": "module",
   "scripts": {

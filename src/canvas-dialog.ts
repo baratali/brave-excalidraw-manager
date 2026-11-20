@@ -1,5 +1,28 @@
 export type CanvasChoice = {action:'save';name:string}|{action:'discard'|'cancel'};
 
+export type RecoveryChoice = 'restore'|'discard'|'cancel';
+
+export function chooseRecoveryAction(root:ShadowRoot):Promise<RecoveryChoice> {
+  return new Promise(resolve=>{
+    const previous=root.activeElement as HTMLElement|null;
+    const dialog=document.createElement('dialog');
+    dialog.className='canvas-dialog';
+    dialog.setAttribute('aria-labelledby','recovery-dialog-title');
+    dialog.setAttribute('aria-describedby','recovery-dialog-description');
+    dialog.innerHTML=`<h2 id="recovery-dialog-title">Restore recovery draft?</h2>
+      <p id="recovery-dialog-description">A recovery draft exists for this drawing. Restore it instead of the disk version?</p>
+      <div class="tools"><button type="button" data-action="restore">Restore</button><button type="button" data-action="discard">Discard</button><button type="button" data-action="cancel" autofocus>Cancel</button></div>`;
+    const finish=(choice:RecoveryChoice)=>{dialog.close();dialog.remove();previous?.focus();resolve(choice);};
+    for(const action of ['restore','discard','cancel'] as const){
+      dialog.querySelector(`[data-action="${action}"]`)!.addEventListener('click',()=>finish(action));
+    }
+    dialog.addEventListener('cancel',event=>{event.preventDefault();finish('cancel');});
+    dialog.addEventListener('keydown',event=>event.stopPropagation());
+    root.append(dialog);
+    dialog.showModal();
+  });
+}
+
 export function chooseCanvasAction(root:ShadowRoot):Promise<CanvasChoice> {
   return new Promise(resolve=>{
     const previous=root.activeElement as HTMLElement|null;
