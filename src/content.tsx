@@ -41,7 +41,7 @@ async function restoreSession(){
   if(disk.revision!==base){
    if(saved){
     loading=true;
-    try{current=(await editor('load',parseScene(disk.text))).scene;base=disk.revision;saved=JSON.stringify(current);}
+    try{const next=parseScene(disk.text);current=(await editor('load',next)).scene;base=disk.revision;saved=JSON.stringify(current);await rpc('draft',{path,scene:next});}
     finally{loading=false;}
     status('Reloaded from disk');
    }else{conflict=disk;paused=true;status('Conflict: disk and restored browser drawing have changed');}
@@ -59,7 +59,7 @@ return <aside className={document.querySelector('.theme--dark')?'dark':''}><head
 }
 createRoot(mount).render(<App/>);list().catch(fail);editor('snapshot').then(s=>{ready=true;current=s.scene;refreshUI();return restoreSession();}).catch(()=>{});
 setInterval(()=>{if(!document.hidden)list().catch(fail);},10000);
-async function poll(){if(!path||paused||busy||loading||transitioning||document.hidden)return;const token=generation,p=path;try{await guard();if(token!==generation||transitioning)return;const disk=await rpc('read',{path:p});if(token!==generation||loading||busy||transitioning)return;if(disk.revision!==base){if(JSON.stringify(current)!==saved){conflict=disk;paused=true;status('Conflict: disk changed');}else{loading=true;try{current=(await editor('load',parseScene(disk.text))).scene;base=disk.revision;saved=JSON.stringify(current);status('Reloaded from disk');}finally{loading=false;}remember();}}}catch(e){if(token!==generation||transitioning)return;paused=true;fail(e);}}
+async function poll(){if(!path||paused||busy||loading||transitioning||document.hidden)return;const token=generation,p=path;try{await guard();if(token!==generation||transitioning)return;const disk=await rpc('read',{path:p});if(token!==generation||loading||busy||transitioning)return;if(disk.revision!==base){if(JSON.stringify(current)!==saved){conflict=disk;paused=true;status('Conflict: disk changed');}else{loading=true;try{const next=parseScene(disk.text);current=(await editor('load',next)).scene;base=disk.revision;saved=JSON.stringify(current);await rpc('draft',{path:p,scene:next});status('Reloaded from disk');}finally{loading=false;}remember();}}}catch(e){if(token!==generation||transitioning)return;paused=true;fail(e);}}
 setInterval(poll,2000);window.addEventListener('focus',()=>{list().catch(fail);poll();});window.addEventListener('beforeunload',e=>{if(path&&(busy||JSON.stringify(current)!==saved)){e.preventDefault();e.returnValue='';}});
 window.addEventListener('hashchange',()=>{forgetSession();paused=true;status('Navigation detected: sync paused.');},true);
 // Prevent website imports from replacing a managed drawing without a save boundary.
