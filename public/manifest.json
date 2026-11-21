@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Excalidraw Folder Manager",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Browse and sync local Excalidraw drawings.",
   "permissions": [
     "storage"
